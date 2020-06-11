@@ -32,7 +32,7 @@ func main() {
 
 	q, err := ch.QueueDeclare(
 		"task_queue", // name
-		true,         // durable
+		true,         // durable => kuyruğun bir RabbitMQ düğümü yeniden başlatıldığında hayatta kalacağından emin olmalıyız.
 		false,        // delete when unused
 		false,        // exclusive
 		false,        // no-wait

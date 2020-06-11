@@ -8,6 +8,8 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"log"
 
 	"github.com/streadway/amqp"
@@ -37,8 +39,19 @@ func main() {
 		nil,     // arguments
 	)
 	failOnError(err, "Failed to declare a queue")
+	type AICIMessage struct {
+		Name string `json:"name"`
+		Mail string `json:"mail"`
+	}
 
-	body := "Mintax!"
+	var b bytes.Buffer
+	encoder := json.NewEncoder(&b)
+	encoder.Encode(AICIMessage{
+		Name: "Salih",
+		Mail: "salih@imaconsult.com",
+	})
+
+	body := b.Bytes()
 	err = ch.Publish(
 		"",     // exchange
 		q.Name, // routing key
@@ -46,7 +59,7 @@ func main() {
 		false,  // immediate
 		amqp.Publishing{
 			ContentType: "text/plain",
-			Body:        []byte(body),
+			Body:        body,
 		})
 	log.Printf(" [x] Sent %s", body)
 	failOnError(err, "Failed to publish a message")
