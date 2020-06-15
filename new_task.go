@@ -9,8 +9,6 @@ package main
 
 import (
 	"log"
-	"os"
-	"strings"
 
 	"github.com/streadway/amqp"
 )
@@ -22,7 +20,7 @@ func failOnError(err error, msg string) {
 }
 
 func main() {
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	conn, err := amqp.Dial("amqp://ici:aqswdefr+@rabbitmq.b1db.com:5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 
@@ -31,16 +29,17 @@ func main() {
 	defer ch.Close()
 
 	q, err := ch.QueueDeclare(
-		"task_queue", // name
-		true,         // durable => kuyruğun bir RabbitMQ düğümü yeniden başlatıldığında hayatta kalacağından emin olmalıyız.
-		false,        // delete when unused
-		false,        // exclusive
-		false,        // no-wait
-		nil,          // arguments
+		"follow_notification_task_que", // name
+		true,                           // durable => kuyruğun bir RabbitMQ düğümü yeniden başlatıldığında hayatta kalacağından emin olmalıyız.
+		false,                          // delete when unused
+		false,                          // exclusive
+		false,                          // no-wait
+		nil,                            // arguments
 	)
 	failOnError(err, "Failed to declare a queue")
 
-	body := bodyFrom(os.Args)
+	//body := bodyFrom(os.Args)
+	body := ""
 	err = ch.Publish(
 		"",     // exchange
 		q.Name, // routing key
@@ -55,12 +54,12 @@ func main() {
 	log.Printf(" [x] Sent %s", body)
 }
 
-func bodyFrom(args []string) string {
-	var s string
-	if (len(args) < 2) || os.Args[1] == "" {
-		s = "hello"
-	} else {
-		s = strings.Join(args[1:], " ")
-	}
-	return s
-}
+//func bodyFrom(args []string) string {
+//	var s string
+//	if (len(args) < 2) || os.Args[1] == "" {
+//		s = "hello"
+//	} else {
+//		s = strings.Join(args[1:], " ")
+//	}
+//	return s
+//}
